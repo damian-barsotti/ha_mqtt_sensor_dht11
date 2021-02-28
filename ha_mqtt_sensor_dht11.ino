@@ -60,38 +60,7 @@ Based on:
 
 #define MQTT_VERSION MQTT_VERSION_3_1_1
 
-// Fill [Redacted] llaces:
-
-// Wifi: SSID and password
-const char* WIFI_SSID = "[Redacted]";
-const char* WIFI_PASSWORD = "[Redacted]";
-
-// If 0.0.0.0 use dhcp
-const IPAddress local_IP(0,0,0,0);
-
-// If neded set your Static IP address
-//const IPAddress local_IP(192, 168, 0, 200);
-// Set your Gateway IP address
-//const IPAddress gateway(192, 168, 0, 1);
-//const IPAddress subnet(255, 255, 255, 0);
-// Optional DNS
-//IPAddress primaryDNS(8, 8, 8, 8);   //optional
-//IPAddress secondaryDNS(8, 8, 4, 4); //optional
-
-// MQTT: ID, server IP, port, username and password
-const PROGMEM char* MQTT_CLIENT_ID = "home_sensor1_dht11";
-const PROGMEM char* MQTT_SERVER_IP = "[Redacted]";
-const PROGMEM uint16_t MQTT_SERVER_PORT = 1883;
-const PROGMEM char* MQTT_USER = "[Redacted]";
-const PROGMEM char* MQTT_PASSWORD = "[Redacted]";
-
-// MQTT: topics
-const PROGMEM char* MQTT_SENSOR_TOPIC = "home/esp8266_1/sensor";
-const PROGMEM char* MQTT_LOG_TOPIC = "home/esp8266_1/log";
-
-// sleeping time
-//const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 600; // 10 minutes x 60 seconds
-const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 20; 
+# include "config.h"
 
 // DHT - D1/GPIO5
 //static const uint8_t D4 = 2;
@@ -263,13 +232,14 @@ void loop() {
         float h = dht.readHumidity();
         // Read temperature as Celsius (the default)
         float t = dht.readTemperature();
-        
+
         if (isnan(h) || isnan(t)) {
             logger_warn("Failed to read from DHT sensor!");
             return;
         } else {
-            //Serial.println(h);
-            //Serial.println(t);
+            // adjust DHT11
+            h = humid_slope * h + humid_shift;
+            t = temp_slope * t + temp_shift; // Read temperature as C
             publishData(t, h);
         }
         

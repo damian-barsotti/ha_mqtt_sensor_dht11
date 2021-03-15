@@ -237,6 +237,7 @@ void loop() {
 
         if (isnan(h) || isnan(t)) {
             logger_warn("Failed to read from DHT sensor!");
+            delay(2000);
             return;
         } else {
             // adjust DHT11

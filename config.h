@@ -31,4 +31,9 @@ const PROGMEM char* MQTT_LOG_TOPIC = "home/esp8266_1/log";
 //const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 600; // 10 minutes x 60 seconds
 const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 20;
 
+// To adjust reads of DHT11
+const float temp_slope = 1.029f;
+const float temp_shift = -5.01f;
+const float humid_slope = 0.899f;
+const float humid_shift = 21.285f;
 

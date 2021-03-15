@@ -167,6 +167,8 @@ bool reconnect() {
         logger_info(String("IP address: ") + WiFi.localIP().toString());
         logger_info(String("MQTT SERVER IP: ") + MQTT_SERVER_IP + ":" + MQTT_SERVER_PORT);
         logger_info(String("MQTT CLIENT ID: ") + MQTT_CLIENT_ID);
+        logger_info(String("temp slope: ") + temp_slope + String(", temp shift: ") + temp_shift
+          + String(", humid slope: ") + humid_slope + String(", humid shift: ") + humid_shift);
         logger_info(String("Number of attempts: ") + String(attempt));
         return true;
     } else

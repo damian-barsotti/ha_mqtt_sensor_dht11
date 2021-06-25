@@ -7,9 +7,15 @@ Based on [Home Assistant DHT22 MQTT Sensor](https://github.com/mertenats/Open-Ho
 - Allow fixed IP configuration (in the case that router's dhcp doesn't work).
 - Restart ESP if maximum number of attempts is reached. 
 - Send log throught MQTT topic.
+- Separate `congig.h` file.
 
 ## Configuration
-configuration.yaml :
+
+### config.h 
+
+Fill this file with your data (the `[redacted]` parts).
+
+### configuration.yaml
 ```yaml
 sensor 1:
     platform: mqtt

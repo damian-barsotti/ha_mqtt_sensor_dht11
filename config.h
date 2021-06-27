@@ -2,8 +2,8 @@
 #define CONFIG_H
 
 // Wifi: SSID and password
-const char* WIFI_SSID = "[Redacted]";
-const char* WIFI_PASSWORD = "[Redacted]";
+const PROGMEM char* WIFI_SSID = "[Redacted]";
+const PROGMEM char* WIFI_PASSWORD = "[Redacted]";
 
 // If 0.0.0.0 use dhcp
 const IPAddress local_IP(0,0,0,0);
@@ -20,7 +20,7 @@ const IPAddress local_IP(0,0,0,0);
 // MQTT: ID, server IP, port, username and password
 const PROGMEM char* MQTT_CLIENT_ID = "home_sensor1_dht11";
 const PROGMEM char* MQTT_SERVER_IP = "[Redacted]";
-const PROGMEM uint16_t MQTT_SERVER_PORT = 1883;
+const uint16_t MQTT_SERVER_PORT = 1883;
 const PROGMEM char* MQTT_USER = "[Redacted]";
 const PROGMEM char* MQTT_PASSWORD = "[Redacted]";
 
@@ -29,7 +29,7 @@ const PROGMEM char* MQTT_SENSOR_TOPIC = "home/esp8266_1/sensor";
 const PROGMEM char* MQTT_LOG_TOPIC = "home/esp8266_1/log";
 
 // sleeping time
-const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 20; 
+const uint16_t SLEEPING_TIME_IN_SECONDS = 20; 
 
 // To adjust reads of DHT11
 

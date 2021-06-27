@@ -60,7 +60,8 @@ Based on:
 
 #define MQTT_VERSION MQTT_VERSION_3_1_1
 
-# include "config.h"
+#include "config_local.h" // File for testing outside git
+#include "config.h"
 
 // DHT - D1/GPIO5
 //static const uint8_t D4 = 2;
@@ -177,26 +178,22 @@ bool reconnect() {
     return attempt < max_attempt;
 }
 
-void setup() {
-    // init the serial
-    Serial.begin(115200);
-    //Take some time to open up the Serial Monitor
-    delay(1000);
-    
-    dht.begin();
-    
+bool setup_wifi() {
+
     // init the WiFi connection
     Serial.println();
     Serial.print("INFO: Connecting to ");
     Serial.println(WIFI_SSID);
     WiFi.mode(WIFI_STA);
     
-    if (local_IP != IPAddress(0,0,0,0)) {
-        if (!WiFi.config(local_IP, gateway, subnet)) {
-            Serial.println("STA Failed to configure fixed IP");
-        }
-    }
+    //  Enable light sleep
+    wifi_set_sleep_type(LIGHT_SLEEP_T);
     
+    if (local_IP != IPAddress(0,0,0,0) && !WiFi.config(local_IP, gateway, subnet)){
+        Serial.println("STA Failed to configure fixed IP");
+        return false;    
+    }
+
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     
     static const int max_attempt = 100;
@@ -207,16 +204,27 @@ void setup() {
         attempt++;
     }
     Serial.println("");
+
+    return (attempt < max_attempt);
+}
+
+void setup() {
+    // init the serial
+    Serial.begin(115200);
+    //Take some time to open up the Serial Monitor
+    delay(1000);
+    
+    dht.begin();
     
     // Restart ESP if max attempt reached
-    if (attempt >= max_attempt){
+    if (!setup_wifi()){
         Serial.println("ERROR: max_attempt reached to WiFi connect");
         Serial.print("Waiting and Restaring");
         delay(SLEEPING_TIME_IN_SECONDS * 1000);
         WiFi.disconnect();
         ESP.restart();
     }
-    
+
     // init the MQTT connection
     client.setServer(MQTT_SERVER_IP, MQTT_SERVER_PORT);
     client.setCallback(callback);

@@ -1,4 +1,5 @@
-// Fill [Redacted] llaces:
+#ifndef CONFIG_H
+#define CONFIG_H
 
 // Wifi: SSID and password
 const char* WIFI_SSID = "[Redacted]";
@@ -28,12 +29,13 @@ const PROGMEM char* MQTT_SENSOR_TOPIC = "home/esp8266_1/sensor";
 const PROGMEM char* MQTT_LOG_TOPIC = "home/esp8266_1/log";
 
 // sleeping time
-//const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 600; // 10 minutes x 60 seconds
-const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 20;
+const PROGMEM uint16_t SLEEPING_TIME_IN_SECONDS = 20; 
 
 // To adjust reads of DHT11
-const float temp_slope = 1.029f;
-const float temp_shift = -5.01f;
-const float humid_slope = 0.899f;
-const float humid_shift = 21.285f;
 
+const float temp_slope = 1.005f;
+const float temp_shift = -1.746f;
+const float humid_slope = 1.775f;
+const float humid_shift = -38.07f;
+
+#endif

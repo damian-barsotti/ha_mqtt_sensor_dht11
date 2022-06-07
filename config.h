@@ -38,4 +38,14 @@ const float temp_shift = -1.746f;
 const float humid_slope = 1.775f;
 const float humid_shift = -38.07f;
 
+#ifdef  ARDUINO_ESP8266_GENERIC
+#define D2 4
+#define D3 0
+#define D4 2
+#define D9 3
+#endif
+
+#define DHTPIN D4
+#define DHTTYPE DHT11
+
 #endif

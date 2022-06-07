@@ -55,7 +55,6 @@ Based on:
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-#include "DHT.h"
 #include <ArduinoJson.h>
 
 #define MQTT_VERSION MQTT_VERSION_3_1_1
@@ -79,12 +78,12 @@ void publish(DynamicJsonDocument root, const char* topic){
     
     Serial.print("Publish in topic "); Serial.println(topic);
     
-    int res = client.publish(topic, data.c_str(), true);
+    bool res = client.publish(topic, data.c_str(), true);
     
     serializeJson(root, Serial);
     
     Serial.println();
-    if (res != 1)
+    if (!res)
         Serial.println(String("Publish result: ") + String(res));  
 }
 

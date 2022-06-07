@@ -63,12 +63,10 @@ Based on:
 #include "config_local.h" // File for testing outside git
 #include "config.h"
 
-// DHT - D1/GPIO5
-//static const uint8_t D4 = 2;
-#define DHTPIN D4
-#define DHTTYPE DHT11
+#include "src/classes/HTReader/HTReader.h"
 
-DHT dht(DHTPIN, DHTTYPE);
+HTReader *sensor;
+
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
@@ -213,9 +211,7 @@ void setup() {
     Serial.begin(115200);
     //Take some time to open up the Serial Monitor
     delay(1000);
-    
-    dht.begin();
-    
+
     // Restart ESP if max attempt reached
     if (!setup_wifi()){
         Serial.println("ERROR: max_attempt reached to WiFi connect");
@@ -228,7 +224,17 @@ void setup() {
     // init the MQTT connection
     client.setServer(MQTT_SERVER_IP, MQTT_SERVER_PORT);
     client.setCallback(callback);
-    
+
+    sensor = new HTReader(
+        DHTPIN, DHTTYPE, SLEEPING_TIME_IN_SECONDS * 1000, N_AVG_SENSOR,
+        temp_slope, temp_shift, humid_slope, humid_shift);
+
+    while (sensor->error()){
+        logger_warn("ERROR: sensor read. Retrying ...");
+        delay(sensor->delay_ms());
+        sensor->reset();
+    }
+
 }
 
 void loop() {
@@ -236,30 +242,18 @@ void loop() {
     if (client.connected() || reconnect()) {
         
         client.loop();
-        
-        // Reading temperature or humidity takes about 250 milliseconds!
-        // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-        float h = dht.readHumidity();
-        // Read temperature as Celsius (the default)
-        float t = dht.readTemperature();
 
-        if (isnan(h) || isnan(t)) {
-            logger_warn("Failed to read from DHT sensor!");
-            delay(2000);
-            return;
-        } else {
-            // adjust DHT11
-            h = humid_slope * h + humid_shift;
-            t = temp_slope * t + temp_shift; // Read temperature as C
-            publishData(t, h);
-        }
-        
+        // Deep sleep restart setup function
+        // so sensor reading is always done
+        publishData(sensor->getTemp(), sensor->getHumid());
+
         logger_info("Closing the MQTT connection");
         client.disconnect();
     }
     
     Serial.println("INFO: Closing the Wifi connection");
     WiFi.disconnect();
+
     ESP.deepSleep(SLEEPING_TIME_IN_SECONDS * 1000000, WAKE_RF_DEFAULT);
     delay(500); // wait for deep sleep to happen
 }

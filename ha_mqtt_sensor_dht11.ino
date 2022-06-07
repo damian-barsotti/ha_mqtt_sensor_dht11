@@ -59,10 +59,10 @@ Based on:
 
 #define MQTT_VERSION MQTT_VERSION_3_1_1
 
+#include "src/classes/HTReader/HTReader.h"
+
 #include "config_local.h" // File for testing outside git
 #include "config.h"
-
-#include "src/classes/HTReader/HTReader.h"
 
 HTReader *sensor;
 

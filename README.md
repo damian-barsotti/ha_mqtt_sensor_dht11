@@ -17,25 +17,19 @@ Fill this file with your data (the `[redacted]` parts).
 
 ### configuration.yaml
 ```yaml
-sensor 1:
-    platform: mqtt
-    name: "Temperature ESP8266 1"
-    state_topic: "home/esp8266_1/sensor"
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-    value_template: "{{ value_json.temperature }}"
-
-sensor 2:
-    platform: mqtt
-    name: "Humidity ESP8266 1"
-    state_topic: "home/esp8266_1/sensor"
-    unit_of_measurement: "%"
-    device_class: "humidity"
-    value_template: "{{ value_json.humidity }}"
-
-sensor 3:
-    platform: mqtt
-    name: "Logger ESP8266 1"
-    state_topic: "home/esp8266_1/log"#    
-    value_template: "{{ value_json.log }}"
+mqtt:
+  sensor:
+    - name: "Temperature ESP8266 1"
+      state_topic: "home/esp8266_1/sensor"
+      unit_of_measurement: "°C"
+      device_class: "temperature"
+      value_template: "{{ value_json.temperature }}"
+    - name: "Humidity ESP8266 1"
+      state_topic: "home/esp8266_1/sensor"
+      unit_of_measurement: "%"
+      device_class: "humidity"
+      value_template: "{{ value_json.humidity }}"
+    - name: "Logger ESP8266 1"
+      state_topic: "home/esp8266_1/log"#    
+      value_template: "{{ value_json.log }}"
 ```

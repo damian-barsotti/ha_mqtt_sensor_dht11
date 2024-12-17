@@ -59,15 +59,22 @@ Based on:
 
 #define MQTT_VERSION MQTT_VERSION_3_1_1
 
-#include "src/classes/HTReader/HTReader.h"
+#include "src/esp8266_controllers/HTReader/HTReader.h"
 
+#if __has_include("config_local.h")
 #include "config_local.h" // File for testing outside git
+#else
 #include "config.h"
+#endif
 
-HTReader *sensor;
+HTReader ht_sensor(
+    DHTPIN, DHTTYPE, SLEEPING_TIME_IN_MSECONDS,
+    temp_slope, temp_shift,
+    humid_slope, humid_shift,
+    n_reads);
 
-WiFiClient wifiClient;
-PubSubClient client(wifiClient);
+WiFiClient wifiC;
+PubSubClient wclient(wifiC);
 
 void publish(DynamicJsonDocument root, const char* topic){
     
@@ -78,7 +85,7 @@ void publish(DynamicJsonDocument root, const char* topic){
     
     Serial.print("Publish in topic "); Serial.println(topic);
     
-    bool res = client.publish(topic, data.c_str(), true);
+    bool res = wclient.publish(topic, data.c_str(), true);
     
     serializeJson(root, Serial);
     
@@ -87,8 +94,8 @@ void publish(DynamicJsonDocument root, const char* topic){
         Serial.println(String("Publish result: ") + String(res));  
 }
 
-String header_log(char* level, int n_log){
-    return String(level) + " " + String(n_log) + ": ";
+String header_log(String level, int n_log){
+    return level + " " + String(n_log) + ": ";
 }
 
 String header_log_info(int n_log){
@@ -96,13 +103,13 @@ String header_log_info(int n_log){
 }
 
 String header_log_warn(int n_log){
-    return header_log("WARN", n_log);
+    return header_log(String("WARN"), n_log);
 }
 
 // function to log throught Serial and mqtt topic
 bool logger(String msg){
     
-    if (client.connected()) {
+    if (wclient.connected()) {
         DynamicJsonDocument root(msg.length()+17);
         root["log"] = msg;
         //  Serial.println(out.length());
@@ -112,7 +119,7 @@ bool logger(String msg){
         return true;
     } else {
         Serial.print("ERROR: failed MQTT connection, rc=");
-        Serial.println(client.state());
+        Serial.println(wclient.state());
         Serial.println(msg);
         return false;
     }
@@ -149,12 +156,12 @@ bool reconnect() {
     static const int max_attempt = 10;
     int attempt = 0;
     
-    while (attempt < max_attempt && !client.connected()) {
+    while (attempt < max_attempt && !wclient.connected()) {
         Serial.println("INFO: Attempting MQTT connection...");
         // Attempt to connect
-        if (! client.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASSWORD)) {
+        if (! wclient.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASSWORD)) {
             Serial.print("ERROR: failed, rc=");
-            Serial.println(client.state());
+            Serial.println(wclient.state());
             Serial.println("DEBUG: try again in 5 seconds");
             // Wait 5 seconds before retrying
             delay(5000);
@@ -221,38 +228,32 @@ void setup() {
     }
 
     // init the MQTT connection
-    client.setServer(MQTT_SERVER_IP, MQTT_SERVER_PORT);
-    client.setCallback(callback);
+    wclient.setServer(MQTT_SERVER_IP, MQTT_SERVER_PORT);
+    wclient.setCallback(callback);
 
-    sensor = new HTReader(
-        DHTPIN, DHTTYPE,
-        temp_slope, temp_shift, humid_slope, humid_shift);
-
-    while (sensor->error()){
-        logger_warn("ERROR: sensor read. Retrying ...");
-        delay(sensor->delay_ms());
-        sensor->reset();
-    }
+    ht_sensor.begin();
+    if (ht_sensor.error())
+        logger_warn("Failed to read from DHT sensor!");
 
 }
 
 void loop() {
     
-    if (client.connected() || reconnect()) {
+    if (wclient.connected() || reconnect()) {
         
-        client.loop();
+        wclient.loop();
 
         // Deep sleep restart setup function
         // so sensor reading is always done
-        publishData(sensor->getTemp(), sensor->getHumid());
+        publishData(ht_sensor.getTemp(), ht_sensor.getHumid());
 
         logger_info("Closing the MQTT connection");
-        client.disconnect();
+        wclient.disconnect();
     }
     
     Serial.println("INFO: Closing the Wifi connection");
     WiFi.disconnect();
 
-    ESP.deepSleep(SLEEPING_TIME_IN_SECONDS * 1000000, WAKE_RF_DEFAULT);
+    ESP.deepSleep(SLEEPING_TIME_IN_MSECONDS * 1000, WAKE_RF_DEFAULT);
     delay(500); // wait for deep sleep to happen
 }

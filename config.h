@@ -29,7 +29,8 @@ const PROGMEM char* MQTT_SENSOR_TOPIC = "home/esp8266_1/sensor";
 const PROGMEM char* MQTT_LOG_TOPIC = "home/esp8266_1/log";
 
 // sleeping time
-const uint16_t SLEEPING_TIME_IN_SECONDS = 20; 
+const uint16_t SLEEPING_TIME_IN_SECONDS = 2; 
+const uint16_t SLEEPING_TIME_IN_MSECONDS = SLEEPING_TIME_IN_SECONDS * 1000; 
 
 // To adjust reads of DHT11
 
@@ -37,6 +38,8 @@ const float temp_slope = 1.005f;
 const float temp_shift = -1.746f;
 const float humid_slope = 1.775f;
 const float humid_shift = -38.07f;
+
+const std::size_t n_reads = 3;
 
 #ifdef  ARDUINO_ESP8266_GENERIC
 #define D2 4

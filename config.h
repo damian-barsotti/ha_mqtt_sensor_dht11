@@ -9,6 +9,7 @@ const PROGMEM char* WIFI_PASSWORD = "[Redacted]";
 const IPAddress local_IP(0,0,0,0);
 
 // If neded set your Static IP address
+// #define STATIC_ADDRESS
 //const IPAddress local_IP(192, 168, 0, 200);
 // Set your Gateway IP address
 //const IPAddress gateway(192, 168, 0, 1);
@@ -27,10 +28,14 @@ const PROGMEM char* MQTT_PASSWORD = "[Redacted]";
 // MQTT: topics
 const PROGMEM char* MQTT_SENSOR_TOPIC = "home/esp8266_1/sensor";
 const PROGMEM char* MQTT_LOG_TOPIC = "home/esp8266_1/log";
+const PROGMEM char* MQTT_WILL_TOPIC = "home/bedroom/esp8266_1/will";
 
 // sleeping time
 const uint16_t SLEEPING_TIME_IN_SECONDS = 2; 
 const uint16_t SLEEPING_TIME_IN_MSECONDS = SLEEPING_TIME_IN_SECONDS * 1000; 
+
+const bool LOG_MQTT_CONNECT = false;
+static const int mqtt_max_attempt = 10;
 
 // To adjust reads of DHT11
 
